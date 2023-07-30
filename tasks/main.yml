@@ -1,23 +1,27 @@
 ---
 # tasks file for aap.network_test
 
-- name: Ping test
-  ansible.builtin.ping:
-  register: ping_result
+- name: Block to Delegate tasks to localhost (Execution Environment)
+  delegate_to: localhost
+  block:
 
-- name: DNS lookup
-  ansible.builtin.command: "nslookup {{ inventory_hostname }}"
-  register: dns_result
-  ignore_errors: yes
+    - name: Ping test
+      ansible.builtin.ping:
+      register: ping_result
 
-- name: Trace route
-  ansible.builtin.command: "traceroute {{ inventory_hostname }}"
-  register: traceroute_result
-  ignore_errors: yes
+    - name: DNS lookup
+      ansible.builtin.command: "nslookup {{ inventory_hostname }}"
+      register: dns_result
+      ignore_errors: true
 
-- name: Display results
-  ansible.builtin.debug:
-    msg: |
-      Ping test result: {{ ping_result.ping }}
-      DNS lookup result: {{ dns_result.stdout }}
-      Trace route result: {{ traceroute_result.stdout }}
+    - name: Trace route
+      ansible.builtin.command: "traceroute {{ inventory_hostname }}"
+      register: traceroute_result
+      ignore_errors: true
+
+    - name: Display results
+      ansible.builtin.debug:
+        msg: |
+          Ping test result: {{ ping_result.ping }}
+          DNS lookup result: {{ dns_result.stdout }}
+          Trace route result: {{ traceroute_result.stdout }}
